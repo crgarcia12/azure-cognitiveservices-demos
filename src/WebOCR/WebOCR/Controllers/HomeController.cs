@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -26,18 +27,24 @@ namespace WebOCR.Controllers
 
             string[] imagesFilesPaths = Directory.GetFiles(@"wwwroot\images\");
 
-            var processedImages = new List<ProcessedImageViewModel>(imagesFilesPaths.Length);
-            foreach(string filePath in imagesFilesPaths)
+            var processedImages = new ConcurrentBag<ProcessedImageViewModel>();
+            List<Task> ProcessImageTasks = new List<Task>(imagesFilesPaths.Length);
+
+
+            foreach (string filePath in imagesFilesPaths)
             {
-
-                string fileName = Path.GetFileName(filePath);
-                processedImages.Add(new ProcessedImageViewModel()
+                ProcessImageTasks.Add(Task.Run(async () =>
                 {
-                    FilePath = @$"images/{fileName}",
-                    OcrText = await cognitiveservices.MakeOCRRequest(filePath)
-                });
-            }
+                    string fileName = Path.GetFileName(filePath);
+                    processedImages.Add(new ProcessedImageViewModel()
+                    {
+                        FilePath = @$"images/{fileName}",
+                        OcrText = await cognitiveservices.MakeOcrRequest_V3(filePath)
+                    });
+                }));
+            };
 
+            await Task.WhenAll(ProcessImageTasks);
             ViewBag.ProcessedImages = processedImages.ToArray();
 
             return View();
