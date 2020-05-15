@@ -67,9 +67,18 @@
                         <img style="width:100%" src="@image.FilePath" />
                     </td>
                     <td style="vertical-align:top">
-                        <div class="jsoncontainer">
-                            @image.OcrText
-                        </div>
+                        @if(ViewBag.TextOnly)
+                        {
+                            <pre>
+                                @image.OcrText
+                            </pre>
+                        }
+                        else
+                        {
+                            <div class="jsoncontainer">
+                                @image.OcrText
+                            </div>
+                        }
                     </td>
                 </tr>
             }

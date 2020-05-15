@@ -18,10 +18,15 @@
 
         public AzureCognitiveServicesOcrService()
         {
-            SubscriptionKey = "KEY";
+            SubscriptionKey = "";
             CognitiveServicesApiUrl = "https://westeurope.api.cognitive.microsoft.com/";
             VisionV2Url = "vision/v2.1/ocr/";
             VisionV3Url = "vision/v3.0-preview/read/";
+
+            if(string.IsNullOrWhiteSpace(SubscriptionKey))
+            {
+                throw new Exception("missing subscription key");
+            }
         }
 
         public async Task<string> MakeOcrRequest(string imageFilePath, bool returnTextOnly, bool use_Api_V2)

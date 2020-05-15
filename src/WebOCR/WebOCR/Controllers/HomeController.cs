@@ -34,7 +34,7 @@ namespace WebOCR.Controllers
             bool isV2 = version == "2";
             bool textOnly = format == "Text";
 
-            cachedProcessedImageViewModel[cacheKey] = (await GetProcessedImages(textOnly, isV2)).ToArray();
+            
             if (!cachedProcessedImageViewModel.ContainsKey(cacheKey))
             {
                 cachedProcessedImageViewModel[cacheKey] = (await GetProcessedImages(textOnly, isV2)).ToArray();
@@ -42,6 +42,7 @@ namespace WebOCR.Controllers
  
 
             ViewBag.ProcessedImages = cachedProcessedImageViewModel[cacheKey];
+            ViewBag.TextOnly = textOnly;
             return View();
         }
 
