@@ -4,26 +4,9 @@
 
 <div class="text-center">
     <h1 class="display-4">Cognitive Services OCR demo</h1>
+
 </div>
 
 <div>
-    <table style="width:100%; border-spacing: 50px;border-collapse: separate;">
-        @{
-            ProcessedImageViewModel[] processedImages = ViewBag.ProcessedImages;
-
-            foreach (ProcessedImageViewModel image in processedImages)
-            {
-                <tr>
-                    <td style="width:50%; vertical-align:top">
-                        <img style="width:100%" src="@image.FilePath" />
-                    </td>
-                    <td>
-                        <pre><code>
-                        <p>@image.OcrText</p>
-                        </code></pre>
-                    </td>
-                </tr>
-            }
-        }
-    </table>
+    <h2 class="display-4">Choose one of the options in the ribbon</h2>
 </div>

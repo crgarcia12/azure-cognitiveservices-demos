@@ -24,12 +24,17 @@
             VisionV3Url = "vision/v3.0-preview/read/";
         }
 
-        public async Task<string> MakeOcrRequest(string imageFilePath)
+        public async Task<string> MakeOcrRequest(string imageFilePath, bool returnTextOnly)
         {
             try
             {
                 //return await MakeOcrRequest_V2(imageFilePath);
-                return await MakeOcrRequest_V3(imageFilePath);
+                string text = await MakeOcrRequest_V3(imageFilePath);
+                if (returnTextOnly)
+                {
+                    text = ExtractTextFromResult(text);
+                }
+                return text;
             }
             catch (Exception e)
             {
@@ -37,7 +42,7 @@
             }
         }
 
-        public async Task<string> MakeOcrRequest_V2(string imageFilePath)
+        private async Task<string> MakeOcrRequest_V2(string imageFilePath)
         {
             try
             {
@@ -91,7 +96,7 @@
         /// the Computer Vision REST API.
         /// </summary>
         /// <param name="imageFilePath">The image file with printed text.</param>
-        public async Task<string> MakeOcrRequest_V3(string imageFilePath)
+        private async Task<string> MakeOcrRequest_V3(string imageFilePath)
         {
             try
             {
@@ -145,14 +150,13 @@
                 var answer = JToken.Parse(contentString);
                 if (answer["status"].ToString() != "running")
                 {
-                    string text = answer.ToString();
-
-                    return SummarizeResults(text);
+                    return answer.ToString();
+                
                 }
             }
         }
 
-        private string SummarizeResults(string text)
+        private string ExtractTextFromResult(string text)
         {
             StringBuilder stringBuilder = new StringBuilder();
             foreach(string line in text.Split(new[] { '\r', '\n' }))

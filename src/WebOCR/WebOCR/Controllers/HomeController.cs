@@ -15,6 +15,9 @@ namespace WebOCR.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        static ProcessedImageViewModel[] cachedProcessedImageViewModelJson;
+        static ProcessedImageViewModel[] cachedProcessedImageViewModelText;
+
 
         public HomeController(ILogger<HomeController> logger)
         {
@@ -22,6 +25,33 @@ namespace WebOCR.Controllers
         }
 
         public async Task<IActionResult> Index()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> TextViewer()
+        {
+            if (cachedProcessedImageViewModelText == null)
+            {
+                cachedProcessedImageViewModelText = (await GetProcessedImages(true)).ToArray();
+            }
+
+            ViewBag.ProcessedImages = cachedProcessedImageViewModelText;
+            return View();
+        }
+
+        public async Task<IActionResult> JsonViewer()
+        {
+            if(cachedProcessedImageViewModelJson == null)
+            {
+                cachedProcessedImageViewModelJson = (await GetProcessedImages(false)).ToArray();
+            }
+
+            ViewBag.ProcessedImages = cachedProcessedImageViewModelJson;
+            return View();
+        }
+
+        private async Task<ConcurrentBag<ProcessedImageViewModel>> GetProcessedImages(bool returnTextOnly)
         {
             var cognitiveservices = new AzureCognitiveServicesOcrService();
 
@@ -38,27 +68,15 @@ namespace WebOCR.Controllers
                     string fileName = Path.GetFileName(filePath);
                     processedImages.Add(new ProcessedImageViewModel()
                     {
-                        FilePath = @$"images/{fileName}",
-                        OcrText = await cognitiveservices.MakeOcrRequest_V3(filePath)
+                        FilePath = @$"/images/{fileName}",
+                        OcrText = await cognitiveservices.MakeOcrRequest(filePath, returnTextOnly)
                     });
                 }));
             };
 
             await Task.WhenAll(ProcessImageTasks);
-            ViewBag.ProcessedImages = processedImages.ToArray();
 
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return processedImages;
         }
     }
 }

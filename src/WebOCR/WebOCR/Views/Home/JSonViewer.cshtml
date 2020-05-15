@@ -1,0 +1,91 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<script type="text/javascript" src="~/js/renderjson.js"></script>
+
+<style>
+    .renderjson {
+        background-color: #303030
+    }
+
+    .renderjson a {
+        text-decoration: none;
+    }
+
+    .renderjson .disclosure {
+        color: crimson;
+        font-size: 150%;
+    }
+
+    .renderjson .syntax {
+        color: grey;
+    }
+
+    .renderjson .string {
+        color: red;
+    }
+
+    .renderjson .number {
+        color: cyan;
+    }
+
+    .renderjson .boolean {
+        color: plum;
+    }
+
+    .renderjson .key {
+        color: lightblue;
+    }
+
+    .renderjson .keyword {
+        color: lightgoldenrodyellow;
+    }
+
+    .renderjson .object.syntax {
+        color: lightseagreen;
+    }
+
+    .renderjson .array.syntax {
+        color: lightsalmon;
+    }
+</style>
+
+<div class="text-center">
+    <h1 class="display-4">Cognitive Services OCR demo</h1>
+</div>
+
+<div>
+    <table style="width:100%; border-spacing: 50px;border-collapse: separate;">
+        @{
+            ProcessedImageViewModel[] processedImages = ViewBag.ProcessedImages;
+
+            foreach (ProcessedImageViewModel image in processedImages)
+            {
+                <tr>
+                    <td style="width:50%; vertical-align:top">
+                        <img style="width:100%" src="@image.FilePath" />
+                    </td>
+                    <td style="vertical-align:top">
+                        <div class="jsoncontainer">
+                            @image.OcrText
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        $(".jsoncontainer").each(function () {
+            var data = $(this).html();
+
+            $(this).empty();
+            $(this).append(
+                renderjson(JSON.parse(data))
+            );
+        })
+    </script>
+}
