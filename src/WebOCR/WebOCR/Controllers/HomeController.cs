@@ -15,9 +15,7 @@ namespace WebOCR.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        static ProcessedImageViewModel[] cachedProcessedImageViewModelJson;
-        static ProcessedImageViewModel[] cachedProcessedImageViewModelText;
-
+        static Dictionary<string, ProcessedImageViewModel[]> cachedProcessedImageViewModel = new Dictionary<string, ProcessedImageViewModel[]>();
 
         public HomeController(ILogger<HomeController> logger)
         {
@@ -29,29 +27,25 @@ namespace WebOCR.Controllers
             return View();
         }
 
-        public async Task<IActionResult> TextViewer()
+        public async Task<IActionResult> GetResults(string version, string format)
         {
-            if (cachedProcessedImageViewModelText == null)
-            {
-                cachedProcessedImageViewModelText = (await GetProcessedImages(true)).ToArray();
-            }
 
-            ViewBag.ProcessedImages = cachedProcessedImageViewModelText;
+            string cacheKey = version + format;
+            bool isV2 = version == "2";
+            bool textOnly = format == "Text";
+
+            cachedProcessedImageViewModel[cacheKey] = (await GetProcessedImages(textOnly, isV2)).ToArray();
+            if (!cachedProcessedImageViewModel.ContainsKey(cacheKey))
+            {
+                cachedProcessedImageViewModel[cacheKey] = (await GetProcessedImages(textOnly, isV2)).ToArray();
+            }
+ 
+
+            ViewBag.ProcessedImages = cachedProcessedImageViewModel[cacheKey];
             return View();
         }
 
-        public async Task<IActionResult> JsonViewer()
-        {
-            if(cachedProcessedImageViewModelJson == null)
-            {
-                cachedProcessedImageViewModelJson = (await GetProcessedImages(false)).ToArray();
-            }
-
-            ViewBag.ProcessedImages = cachedProcessedImageViewModelJson;
-            return View();
-        }
-
-        private async Task<ConcurrentBag<ProcessedImageViewModel>> GetProcessedImages(bool returnTextOnly)
+        private async Task<ConcurrentBag<ProcessedImageViewModel>> GetProcessedImages(bool returnTextOnly, bool use_Api_V2)
         {
             var cognitiveservices = new AzureCognitiveServicesOcrService();
 
@@ -69,7 +63,7 @@ namespace WebOCR.Controllers
                     processedImages.Add(new ProcessedImageViewModel()
                     {
                         FilePath = @$"/images/{fileName}",
-                        OcrText = await cognitiveservices.MakeOcrRequest(filePath, returnTextOnly)
+                        OcrText = await cognitiveservices.MakeOcrRequest(filePath, returnTextOnly, use_Api_V2)
                     });
                 }));
             };

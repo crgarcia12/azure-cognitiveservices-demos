@@ -24,12 +24,20 @@
             VisionV3Url = "vision/v3.0-preview/read/";
         }
 
-        public async Task<string> MakeOcrRequest(string imageFilePath, bool returnTextOnly)
+        public async Task<string> MakeOcrRequest(string imageFilePath, bool returnTextOnly, bool use_Api_V2)
         {
             try
             {
-                //return await MakeOcrRequest_V2(imageFilePath);
-                string text = await MakeOcrRequest_V3(imageFilePath);
+                string text;
+                if (use_Api_V2)
+                {
+                    text = await MakeOcrRequest_V2(imageFilePath);
+                }
+                else
+                {
+                    text = await MakeOcrRequest_V3(imageFilePath);
+                }
+
                 if (returnTextOnly)
                 {
                     text = ExtractTextFromResult(text);

@@ -22,10 +22,16 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="TextViewer">Show Text Only</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="GetResults" asp-route-version="2" asp-route-format="Text">Text-V2</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="JsonViewer">Show JSon</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="GetResults" asp-route-version="2" asp-route-format="Json">Json-V2</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="GetResults" asp-route-version="3" asp-route-format="Text">Text-V3</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="GetResults" asp-route-version="3" asp-route-format="Json">Json-V3</a>
                         </li>
 
                     </ul>
